@@ -1,0 +1,10 @@
+.idea
+*.iml
+
+data/besu/
+!data/besu/.gitkeep
+
+data/teku/
+!data/teku/.gitkeep
+
+secret/token.txt
