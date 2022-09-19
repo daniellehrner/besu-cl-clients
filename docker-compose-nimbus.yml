@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   besu_node:
-    image: hyperledger/besu:latest
+    image: hyperledger/besu:22.7.3-local
     command: ["--network=sepolia",
               "--data-path=/opt/besu/data/data",
               "--data-storage-format=BONSAI",
@@ -21,20 +21,15 @@ services:
       - "8545:8545"
       - "30303:30303/tcp"
       - "30303:30303/udp"
-  teku_node:
-    environment:
-      - "JAVA_OPTS=-Xmx4g"
-    image: consensys/teku:latest
+  prysm_node:
+    image: statusim/nimbus-eth2:amd64-latest
     command: ["--network=sepolia",
-              "--data-base-path=/opt/teku/data",
-              "--p2p-port=9000",
-              "--rest-api-enabled=true",
-              "--rest-api-docs-enabled=true",
-              "--ee-endpoint=http://besu_node:8551",
-              "--ee-jwt-secret-file=/secret/token.txt"]
+              "--data-dir=/opt/nimbus/data",
+              "--web3-url=http://besu_node:8551",
+              "--jwt-secret=/secret/token.txt"]
     volumes:
       - ./secret:/secret
-      - ./data/teku:/opt/teku/data
+      - ./data/nimbus:/opt/nimbus/data
     depends_on:
       - besu_node
     ports:

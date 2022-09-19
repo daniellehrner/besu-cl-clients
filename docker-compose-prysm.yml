@@ -1,0 +1,45 @@
+version: '3.4'
+services:
+  besu_node:
+    image: hyperledger/besu:22.7.3-local
+    command: ["--network=sepolia",
+              "--data-path=/opt/besu/data/data",
+              "--data-storage-format=BONSAI",
+              "--host-allowlist=*",
+              "--sync-mode=X_CHECKPOINT",
+              "--rpc-http-enabled",
+              "--rpc-http-cors-origins=*",
+              "--fast-sync-min-peers=1",
+              "--rpc-http-api=ADMIN,ETH,NET,WEB3",
+              "--engine-host-allowlist=*",
+              "--engine-jwt-secret=/secret/token.txt"]
+    volumes:
+      - ./secret:/secret
+      - ./data/besu:/opt/besu/data
+    ports:
+      # Map the p2p port(30303) and RPC HTTP port(8545)
+      - "8545:8545"
+      - "30303:30303/tcp"
+      - "30303:30303/udp"
+  prysm_node:
+    image: gcr.io/prysmaticlabs/prysm/beacon-chain:stable
+    command: ["--sepolia",
+              "--datadir=/opt/prysm/data",
+              "--execution-endpoint=http://besu_node:8551",
+              "--jwt-secret=/secret/token.txt",
+              "--rpc-host=0.0.0.0",
+              "--grpc-gateway-host=0.0.0.0",
+              "--monitoring-host=0.0.0.0",
+              "--checkpoint-sync-url=https://sepolia.checkpoint-sync.ethpandaops.io",
+              "--genesis-beacon-api-url=https://sepolia.checkpoint-sync.ethpandaops.io",
+              "--accept-terms-of-use"]
+    volumes:
+      - ./secret:/secret
+      - ./data/prysm:/opt/prysm/data
+    depends_on:
+      - besu_node
+    ports:
+      # Map the p2p port(9000) and REST API port(5051)
+      - "9000:9000/tcp"
+      - "9000:9000/udp"
+      - "5051:5051"

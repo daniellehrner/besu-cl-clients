@@ -7,4 +7,10 @@ data/besu/
 data/teku/
 !data/teku/.gitkeep
 
+data/prysm/
+!data/prysm/.gitkeep
+
+data/nimbus/
+!data/nimbus/.gitkeep
+
 secret/token.txt

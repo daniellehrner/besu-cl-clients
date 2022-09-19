@@ -1,0 +1,45 @@
+version: '3.4'
+services:
+  besu_node:
+    image: hyperledger/besu:22.7.3-local
+    command: ["--network=sepolia",
+              "--data-path=/opt/besu/data/data",
+              "--data-storage-format=BONSAI",
+              "--host-allowlist=*",
+              "--sync-mode=X_CHECKPOINT",
+              "--rpc-http-enabled",
+              "--rpc-http-cors-origins=*",
+              "--fast-sync-min-peers=1",
+              "--rpc-http-api=ADMIN,ETH,NET,WEB3",
+              "--engine-host-allowlist=*",
+              "--engine-jwt-secret=/secret/token.txt"]
+    volumes:
+      - ./secret:/secret
+      - ./data/besu:/opt/besu/data
+    ports:
+      # Map the p2p port(30303) and RPC HTTP port(8545)
+      - "8545:8545"
+      - "30303:30303/tcp"
+      - "30303:30303/udp"
+  teku_node:
+    environment:
+      - "JAVA_OPTS=-Xmx4g"
+    image: consensys/teku:latest
+    command: ["--network=sepolia",
+              "--data-base-path=/opt/teku/data",
+              "--p2p-port=9000",
+              "--rest-api-enabled=true",
+              "--rest-api-docs-enabled=true",
+              "--ee-endpoint=http://besu_node:8551",
+              "--ee-jwt-secret-file=/secret/token.txt",
+              "--initial-state=https://sepolia.checkpoint-sync.ethpandaops.io/eth/v2/debug/beacon/states/finalized"]
+    volumes:
+      - ./secret:/secret
+      - ./data/teku:/opt/teku/data
+    depends_on:
+      - besu_node
+    ports:
+      # Map the p2p port(9000) and REST API port(5051)
+      - "9000:9000/tcp"
+      - "9000:9000/udp"
+      - "5051:5051"
