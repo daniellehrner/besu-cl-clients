@@ -1,4 +1,4 @@
-# Teku - Besu docker compose setup
+# Besu / CL client docker compose setup
 
 ## Initial setup 
 #### Create the JWT secret
