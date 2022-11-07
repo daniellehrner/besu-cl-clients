@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   besu_node:
-    image: hyperledger/besu:22.7.3-local
+    image: hyperledger/besu:latest
     command: ["--network=sepolia",
               "--data-path=/opt/besu/data/data",
               "--data-storage-format=BONSAI",
